@@ -1,0 +1,111 @@
+OpenCV face recognizers
+ 
+
+OpenCV has three built-in face recognizers:
+EigenFaces – cv2.face.createEigenFaceRecognizer()
+FisherFaces – cv2.face.createFisherFaceRecognizer()
+Local Binary Patterns Histograms (LBPH) – cv2.face.createLBPHFaceRecognizer()
+Experiment  1:
+Eigenfaces face recognizer
+ 
+experiment 2:
+Fisherfaces face recognizer
+This algorithm is an improved version of the last one. As we just saw, EigenFaces looks at all the training faces of all the people at once and finds principal components from all of them combined. By doing that, it doesn't focus on the features that discriminate one individual from another. Instead, it concentrates on the ones that represent all the faces of all the people in the training data, as a whole.
+
+ 
+experiment3:
+Local binary patterns histograms (LBPH) Face Recognizer
+I wrote a detailed explanation of Local Binary Patterns Histograms in my previous article on face detection, which I’m sure you’ve read by now. So, here I will just give a brief overview of how it works.
+
+We know that Eigenfaces and Fisherfaces are both affected by light and, in real life, we can't guarantee perfect light conditions. LBPH face recognizer is an improvement to overcome this drawback.
+
+The idea with LBPH is not to look at the image as a whole, but instead, try to find its local structure by comparing each pixel to the neighboring pixels. 
+
+The LBPH Face Recognizer Process
+Take a 3×3 window and move it across one image. At each move (each local part of the picture), compare the pixel at the center, with its surrounding pixels. Denote the neighbors with intensity value less than or equal to the center pixel by 1 and the rest by 0.
+
+After you read these 0/1 values under the 3×3 window in a clockwise order, you will have a binary pattern like 11100011 that is local to a particular area of the picture. When you finish doing this on the whole image, you will have a list of local binary patterns.
+
+
+
+ 
+ 
+
+#OpenCV module
+ 
+ 
+#Prepare training data
+ 
+
+ 
+#there is no label 0 in our training data so subject name for index/label 0 is empty
+subjects = ["", "Ramiz Raja", "Elvis Presley"]
+
+Data Preparation for Face Recognition
+Perhaps you are thinking: Why are are we talking about preparing data?
+Well, to know which face belongs to which person, OpenCV face recognizer accepts information in a particular format. In fact, it receives two vectors:
+
+One is the faces of all the people.
+The second is the integer labels for each face.
+ 
+
+ 
+
+ 
+function to detect face using OpenCV
+facedetection(img):
+ 
+ 
+return faces, labels
+
+We have defined a function that takes the path where it stores training subjects' folders as a parameter. This function follows the same data preparation sub steps that we reviewed previously:
+
+(step-1) In line 8, we used the methodos.listdir to read names of all folders stored on the path, so they start functioning as a parameter.
+In line 10-13 we defined labels and faces vectors.
+
+(step-2) After that, we went through all subjects' folder names and from each one we extracted, in line 27, the label information. As folder names follow the sLabelnaming convention, just by removing the letters from folder name we will get the tag assigned to that subject.
+
+(step-3) In line 34, we read all the current person's images, and in lines 39-66 we went through traverse those images one by one.
+
+In lines 53-54, we used OpenCV's imshow(window_title, image) along with OpenCV's waitKey(interval) methods to display the current picture.
+
+The methodwaitKey(interval) pauses the code flow for the given interval (milliseconds). So, we are using a 100ms interval so that we can view the image window for that time.
+
+In line 57, we implemented face detection on the current picture.
+
+(step-4) In lines 62-66, we added the detected face and label to their respective vectors.
+
+But a function can't do anything unless we call it on some data that it has to prepare, right? Don't worry; I have got data for two faces. I am sure you will recognize at least one of them!
+
+I’m pretty sure that The King is the ghost, so I’ve put his image into the face recognition step. I recognize his face, and I am sure you will recognize hi
+Train Face Recognizer
+As we mentioned earlier, OpenCV comes equipped with three face recognizers.
+
+EigenFaces: cv2.face.createEigenFaceRecognizer()
+FisherFaces: cv2.face.createFisherFaceRecognizer()
+Local Binary Patterns Histogram (LBPH): cv2.face.LBPHFisherFaceRecognizer()
+
+ 
+create our LBPH face recognizer 
+face_recognizer = cv2.face.createLBPHFaceRecognizer()
+
+or 
+face_recognizer = cv2.face.createEigenFaceRecognizer()
+
+or 
+#face_recognizer = cv2.face.createFisherFaceRecognizer()
+
+Now that we have initialized our face recognizer and we also have prepared our training data, it's time to train. We will do that by calling the methodtrain(faces-vector, labels-vector) of face recognizer.
+
+ 
+face_recognizer.train(faces, np.array(labels))
+
+Did you notice that instead of passing vectorlabels directly to face recognizer, we are first converting it to numpy array? The reason is that OpenCV expects labels vector to be a numpyarray.
+
+This is my favourite part now, when we find out if the thief is the King of Rock and Roll or not. The anticipation is killing me… Here we go! It’s time for the…
+
+
+Prediction
+ 
+ 
+
